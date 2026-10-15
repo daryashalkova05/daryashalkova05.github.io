@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тренажёр: проектная, исследовательская и поисковая технологии в обучении математике</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F5FB; --card:#FFFFFF; --accent:#7C3AED; --accent-dark:#5B21B6;
+  --accent-light:#EDE9FE; --ok:#10B981; --err:#EF4444; --warn:#F59E0B; --text:#1F2937;
+  --radius:16px; --shadow:0 6px 24px rgba(124,58,237,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.55;padding-bottom:60px}
+h1,h2,h3,h4{font-family:'Montserrat',sans-serif;color:var(--accent-dark)}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+
+/* Header */
+header{background:linear-gradient(135deg,#5B21B6,#7C3AED);padding:34px 16px 90px;text-align:center}
+header h1{color:#fff;font-size:clamp(1.25rem,3.5vw,2rem);font-weight:800}
+header p{color:#EDE9FE;margin-top:10px;font-size:clamp(.9rem,2.2vw,1.05rem)}
+
+/* Tabs */
+.tabs{display:flex;gap:10px;justify-content:center;margin:-52px auto 0;position:relative;z-index:2;flex-wrap:wrap;padding:0 16px}
+.tab{border:none;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:700;font-size:1rem;padding:14px 26px;border-radius:14px;background:#fff;color:var(--accent-dark);box-shadow:var(--shadow);transition:all .3s ease}
+.tab:hover{transform:translateY(-2px)}
+.tab.active{background:var(--accent-dark);color:#fff}
+.tab .badge{background:var(--ok);color:#fff;border-radius:999px;font-size:.75rem;padding:1px 8px;margin-left:8px;display:none}
+.tab .badge.on{display:inline-block}
+
+/* Progress */
+.progress-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin:22px auto 0;max-width:960px}
+.progress-card.top{margin-top:26px}
+.pbar-label{display:flex;justify-content:space-between;font-size:.9rem;font-weight:600;margin-bottom:8px;color:var(--accent-dark)}
+.pbar{height:12px;background:var(--accent-light);border-radius:999px;overflow:hidden}
+.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#7C3AED,#A78BFA);border-radius:999px;transition:width .6s ease}
+
+/* Sections */
+.section{display:none;margin-top:20px}
+.section.active{display:block;animation:fadeUp .5s ease both}
+.section-sub{background:var(--accent-light);border-radius:var(--radius);padding:16px 20px;color:var(--accent-dark);font-weight:600;margin-bottom:18px}
+
+/* Task cards */
+.task{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
+.task-head{display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;user-select:none;transition:background .2s}
+.task-head:hover{background:#FAF8FF}
+.task-num{flex:0 0 44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;font-family:'Montserrat';font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.task-head h3{font-size:1.05rem;flex:1}
+.task-tag{font-size:.72rem;background:var(--accent-light);color:var(--accent-dark);padding:4px 10px;border-radius:999px;font-weight:600;white-space:nowrap}
+.task-check{color:var(--ok);font-weight:800;opacity:0;transition:opacity .4s}
+.task-check.on{opacity:1}
+.task-arrow{color:var(--accent);transition:transform .3s;font-size:1.2rem}
+.task.open .task-arrow{transform:rotate(90deg)}
+.task-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s ease}
+.task.open .task-body{grid-template-rows:1fr}
+.task-body>div{overflow:hidden}
+.task-content{padding:0 20px 22px}
+
+/* Steps */
+.step{background:#FBFAFE;border:1px solid var(--accent-light);border-radius:14px;padding:18px;margin-bottom:14px}
+.step-title{font-family:'Montserrat';font-weight:700;color:var(--accent-dark);margin-bottom:10px;font-size:.98rem}
+p.situation{background:var(--accent-light);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-weight:500}
+
+/* Controls */
+.btn{border:none;cursor:pointer;font-family:'Montserrat';font-weight:700;border-radius:12px;padding:11px 22px;font-size:.95rem;transition:all .25s ease;background:var(--accent);color:#fff}
+.btn:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 6px 16px rgba(124,58,237,.3)}
+.btn:disabled{background:#C4B5FD;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:#fff;color:var(--accent-dark);border:2px solid var(--accent)}
+.btn.ghost:hover{background:var(--accent-light)}
+.btn.small{padding:7px 14px;font-size:.85rem}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+input[type=text],textarea{width:100%;border:2px solid #DDD6FE;border-radius:12px;padding:11px 14px;font-family:'Inter';font-size:.95rem;background:#fff;transition:border-color .2s}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:70px}
+label.opt{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--accent-light);border-radius:12px;padding:10px 14px;margin-bottom:8px;cursor:pointer;transition:all .2s;font-size:.93rem}
+label.opt:hover{border-color:var(--accent)}
+label.opt input{accent-color:var(--accent);width:18px;height:18px;flex:0 0 auto}
+
+/* Feedback */
+.fb{border-radius:12px;padding:13px 16px;margin-top:14px;font-size:.93rem;animation:fadeUp .45s ease both}
+.fb.ok{background:#ECFDF5;border:2px solid var(--ok);color:#065F46;animation:pop .45s ease}
+.fb.err{background:#FEF2F2;border:2px solid var(--err);color:#991B1B;animation:shake .4s ease}
+.fb.hint{background:#FFFBEB;border:2px solid var(--warn);color:#92400E}
+.shake{animation:shake .4s ease !important}
+
+/* Tables */
+table.calc{width:100%;border-collapse:collapse;margin:10px 0;background:#fff;border-radius:12px;overflow:hidden}
+table.calc th{background:var(--accent);color:#fff;font-family:'Montserrat';font-size:.85rem;padding:9px}
+table.calc td{padding:8px;border:1px solid var(--accent-light);text-align:center;font-size:.92rem}
+table.calc input{width:90px;text-align:center;padding:7px;border-radius:8px;border:2px solid #DDD6FE}
+
+/* DnD */
+.pool,.zone-list{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:2px dashed #C4B5FD;border-radius:12px;background:#fff;min-height:52px;margin-top:8px}
+.chip{background:var(--accent-light);color:var(--accent-dark);font-weight:600;font-size:.85rem;padding:8px 13px;border-radius:999px;cursor:grab;user-select:none;transition:all .2s;border:2px solid transparent}
+.chip:hover{background:#DDD6FE}
+.chip.sel{border-color:var(--accent);background:var(--accent);color:#fff}
+.chip.dragging{opacity:.5}
+.zone{background:#fff;border:2px solid var(--accent-light);border-radius:14px;padding:12px;margin-bottom:12px}
+.zone h4{font-size:.92rem;margin-bottom:4px}
+.zone .zone-list{border-style:solid;background:#FBFAFE}
+.ord-card{background:#fff;border:2px solid var(--accent-light);border-radius:12px;padding:11px 14px;margin-bottom:8px;cursor:grab;font-size:.92rem;display:flex;gap:10px;align-items:center}
+.ord-card .grip{color:#A78BFA;font-weight:800}
+.ord-card.sel{border-color:var(--accent);background:var(--accent-light)}
+.hint-line{font-size:.85rem;color:#6B7280;margin-top:6px}
+
+/* Situations (task 4) */
+.situation-block{background:#fff;border:2px solid var(--accent-light);border-radius:14px;padding:14px;margin-bottom:12px}
+.situation-block p{margin-bottom:10px;font-size:.93rem}
+.tech-btns{display:flex;gap:8px;flex-wrap:wrap}
+.tech-btns .btn.correct-pick{background:var(--ok)}
+.tech-btns .btn:disabled{cursor:default}
+.tech-btns .btn.wrong-pick{background:var(--err)}
+
+/* Itog */
+.itog{background:linear-gradient(135deg,#EDE9FE,#F7F5FB);border:2px solid var(--accent);border-radius:16px;padding:20px;margin-top:8px}
+.itog h4{margin-bottom:8px}
+.itog ul{margin:8px 0 8px 20px}
+.itog .btn{margin-top:12px}
+
+/* Certificate */
+#certBlock{display:none;margin-top:40px;text-align:center;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px 20px}
+#certBlock.on{display:block;animation:fadeUp .6s ease both}
+#certBlock h2{margin-bottom:8px}
+#certBlock input{max-width:340px;margin:14px auto;display:block}
+#certBlock .btn{font-size:1.05rem;padding:14px 34px}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(31,41,55,.6);z-index:50;overflow:auto;padding:20px}
+.modal.on{display:flex;align-items:center;justify-content:center;animation:fadeIn .3s ease}
+.cert{width:100%;max-width:900px;background:#fff;border-radius:18px;padding:0;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.cert-inner{border:6px solid var(--accent);margin:18px;border-radius:12px;padding:44px 30px;text-align:center;position:relative;background:
+  radial-gradient(circle at 12% 15%, rgba(124,58,237,.07), transparent 40%),
+  radial-gradient(circle at 88% 85%, rgba(124,58,237,.07), transparent 40%),#fff}
+.cert-logo{width:74px;height:74px;border-radius:50%;background:var(--accent);color:#fff;font-size:2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:'Montserrat';font-weight:800}
+.cert h2{font-size:clamp(1.2rem,3.4vw,1.9rem);margin-bottom:8px}
+.cert .sub{color:var(--accent);font-weight:600;margin-bottom:26px;font-size:clamp(.9rem,2.4vw,1.1rem)}
+.cert .name-line{font-size:clamp(1.1rem,3vw,1.6rem);font-family:'Montserrat';font-weight:800;color:var(--text);border-bottom:2px dashed #A78BFA;display:inline-block;padding:0 30px 6px;min-width:260px}
+.cert .lbl{font-size:.8rem;color:#6B7280;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.cert .date{margin-top:22px;color:#374151;font-weight:600}
+.cert .sign{margin-top:30px;font-size:.85rem;color:#6B7280;font-style:italic}
+.modal-actions{display:flex;gap:10px;justify-content:center;padding:16px;background:#fff;border-top:1px solid var(--accent-light)}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.fade-up{animation:fadeUp .5s ease both}
+
+@media(max-width:560px){
+  .task-head h3{font-size:.92rem}
+  .task-tag{display:none}
+  table.calc input{width:70px}
+  .cert-inner{padding:30px 14px;margin:10px}
+}
+
+/* Print: only certificate */
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body{background:#fff}
+  body>*{display:none !important}
+  #certModal{display:flex !important;position:static;inset:auto;padding:0;background:#fff}
+  #certModal .modal-actions{display:none !important}
+  .cert{box-shadow:none;max-width:100%}
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<header>
+  <h1>Проектная, исследовательская и поисковая технологии<br>в обучении математике</h1>
+  <p>Интерактивный тренажёр с обратной связью: не «потыкать», а понять</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" id="tabStudents" onclick="switchTab('students')">🎓 Для учеников <span class="badge" id="badgeS">✓</span></button>
+  <button class="tab" id="tabTeachers" onclick="switchTab('teachers')">👩‍🏫 Для учителей <span class="badge" id="badgeT">✓</span></button>
+</div>
+
+<div class="wrap">
+  <!-- Overall progress -->
+  <div class="progress-card top">
+    <div class="pbar-label"><span>Общий прогресс</span><span id="topLabel">Пройдено 0 из 6 заданий</span></div>
+    <div class="pbar"><div class="pbar-fill" id="topFill"></div></div>
+  </div>
+
+  <!-- ================= STUDENTS ================= -->
+  <div class="section active" id="secStudents">
+    <div class="progress-card">
+      <div class="pbar-label"><span>🎓 Раздел «Для учеников»</span><span id="labelS">Пройдено 0 из 3 заданий</span></div>
+      <div class="pbar"><div class="pbar-fill" id="fillS"></div></div>
+    </div>
+    <div class="section-sub">Три задания по теме «Проценты» (6 класс). Пройди путь: найди способ → проверь гипотезу → создай продукт.</div>
+
+    <div class="task" data-task="t1">
+      <div class="task-head" onclick="toggleTask(this)">
+        <div class="task-num">1</div>
+        <h3>«Найди способ» — скидка в торговом центре</h3>
+        <span class="task-tag">Поисковая технология</span>
+        <span class="task-check" id="check-t1">✅</span>
+        <span class="task-arrow">›</span>
+      </div>
+      <div class="task-body"><div><div class="task-content" id="mount-t1"></div></div></div>
+    </div>
+
+    <div class="task" data-task="t2">
+      <div class="task-head" onclick="toggleTask(this)">
+        <div class="task-num">2</div>
+        <h3>«Проверь гипотезу» — работает ли способ всегда?</h3>
+        <span class="task-tag">Исследовательская технология</span>
+        <span class="task-check" id="check-t2">✅</span>
+        <span class="task-arrow">›</span>
+      </div>
+      <div class="task-body"><div><div class="task-content" id="mount-t2"></div></div></div>
+    </div>
+
+    <div class="task" data-task="t3">
+      <div class="task-head" onclick="toggleTask(this)">
+        <div class="task-num">3</div>
+        <h3>«Собери продукт» — памятка «Как считать скидки»</h3>
+        <span class="task-tag">Проектная технология</span>
+        <span class="task-check" id="check-t3">✅</span>
+        <span class="task-arrow">›</span>
+      </div>
+      <div class="task-body"><div><div class="task-content" id="mount-t3"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ================= TEACHERS ================= -->
+  <div class="section" id="secTeachers">
+    <div class="progress-card">
+      <div class="pbar-label"><span>👩‍🏫 Раздел «Для учителей»</span><span id="labelT">Пройдено 0 из 3 заданий</span></div>
+      <div class="pbar"><div class="pbar-fill" id="fillT"></div></div>
+    </div>
+    <div class="section-sub">Тренажёр по методике. Различай технологии, подбирай приёмы, оценивай работу.</div>
+
+    <div class="task" data-task="t4">
+      <div class="task-head" onclick="toggleTask(this)">
+        <div class="task-num">4</div>
+        <h3>«Определи технологию» — шесть классных ситуаций</h3>
+        <span class="task-tag">Теория технологий</span>
+        <span class="task-check" id="check-t4">✅</span>
+        <span class="task-arrow">›</span>
+      </div>
+      <div class="task-body"><div><div class="task-content" id="mount-t4"></div></div></div>
+    </div>
+
+    <div class="task" data-task="t5">
+      <div class="task-head" onclick="toggleTask(this)">
+        <div class="task-num">5</div>
+        <h3>«Подбери приём к этапу урока»</h3>
+        <span class="task-tag">Методика урока</span>
+        <span class="task-check" id="check-t5">✅</span>
+        <span class="task-arrow">›</span>
+      </div>
+      <div class="task-body"><div><div class="task-content" id="mount-t5"></div></div></div>
+    </div>
+
+    <div class="task" data-task="t6">
+      <div class="task-head" onclick="toggleTask(this)">
+        <div class="task-num">6</div>
+        <h3>«Оцени работу ученика» — проект Пети</h3>
+        <span class="task-tag">Формирующее оценивание</span>
+        <span class="task-check" id="check-t6">✅</span>
+        <span class="task-arrow">›</span>
+      </div>
+      <div class="task-body"><div><div class="task-content" id="mount-t6"></div></div></div>
+    </div>
+  </div>
+
+  <!-- Certificate -->
+  <div id="certBlock">
+    <h2>🏆 Все 6 заданий пройдены!</h2>
+    <p>Ты прошёл весь тренажёр. Получи сертификат об успешном прохождении.</p>
+    <input type="text" id="certName" placeholder="Введи своё имя и фамилию" maxlength="60">
+    <button class="btn" onclick="openCert()">📜 Скачать сертификат</button>
+  </div>
+</div>
+
+<!-- Certificate modal -->
+<div class="modal" id="certModal">
+  <div class="cert">
+    <div class="cert-inner">
+      <div class="cert-logo">π</div>
+      <h2>Сертификат об успешном прохождении тренажёра</h2>
+      <div class="sub">Проектная, исследовательская и поисковая технологии<br>в обучении математике</div>
+      <div class="lbl">Настоящий сертификат вручается</div>
+      <div class="name-line" id="certNameOut">Имя не указано</div>
+      <div class="date" id="certDate"></div>
+      <div class="sign">Тренажёр по современным технологиям обучения математике</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="window.print()">🖨️ Распечатать / Сохранить как PDF</button>
+      <button class="btn ghost" onclick="closeCert()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= STATE / PROGRESS ================= */
+const LS_KEY='pptTrainerProgress_v1';
+let progress={t1:false,t2:false,t3:false,t4:false,t5:false,t6:false};
+try{const s=localStorage.getItem(LS_KEY);if(s)progress=Object.assign(progress,JSON.parse(s));}catch(e){}
+function saveProgress(){try{localStorage.setItem(LS_KEY,JSON.stringify(progress));}catch(e){}}
+function countDone(keys){return keys.filter(k=>progress[k]).length;}
+function updateUI(){
+  const s=countDone(['t1','t2','t3']),t=countDone(['t4','t5','t6']),all=s+t;
+  document.getElementById('labelS').textContent='Пройдено '+s+' из 3 заданий';
+  document.getElementById('fillS').style.width=(s/3*100)+'%';
+  document.getElementById('labelT').textContent='Пройдено '+t+' из 3 заданий';
+  document.getElementById('fillT').style.width=(t/3*100)+'%';
+  document.getElementById('topLabel').textContent='Пройдено '+all+' из 6 заданий';
+  document.getElementById('topFill').style.width=(all/6*100)+'%';
+  document.getElementById('badgeS').classList.toggle('on',s===3);
+  document.getElementById('badgeT').classList.toggle('on',t===3);
+  ['t1','t2','t3','t4','t5','t6'].forEach(k=>{
+    document.getElementById('check-'+k).classList.toggle('on',progress[k]);
+  });
+  document.getElementById('certBlock').classList.toggle('on',all===6);
+}
+function markDone(id){if(!progress[id]){progress[id]=true;saveProgress();updateUI();}}
+
+/* ================= UI HELPERS ================= */
+function switchTab(which){
+  const sBtn=document.getElementById('tabStudents'),tBtn=document.getElementById('tabTeachers');
+  const sSec=document.getElementById('secStudents'),tSec=document.getElementById('secTeachers');
+  if(which==='students'){sBtn.classList.add('active');tBtn.classList.remove('active');sSec.classList.add('active');tSec.classList.remove('active');}
+  else{tBtn.classList.add('active');sBtn.classList.remove('active');tSec.classList.add('active');sSec.classList.remove('active');}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleTask(head){
+  const task=head.parentElement,body=task.querySelector('.task-content');
+  task.classList.toggle('open');
+  if(task.classList.contains('open')&&!body.dataset.inited){
+    body.dataset.inited='1';
+    const map={t1:task1Def,t2:task2Def,t3:task3Def,t4:task4Def,t5:task5Def,t6:task6Def};
+    startTask(body,map[task.dataset.task]);
+  }
+}
+function norm(s){return (s||'').toLowerCase().replace(/\s+/g,'').replace(/,/g,'.').replace(/:/g,'/').replace(/[·×÷]/g,'*').replace(/х/g,'x');}
+function fb(step,type,html){
+  const box=step.querySelector('.fb-holder')||(()=>{const d=document.createElement('div');d.className='fb-holder';step.appendChild(d);return d;})();
+  box.innerHTML='';
+  const d=document.createElement('div');
+  d.className='fb '+type;
+  d.innerHTML=html;
+  box.appendChild(d);
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+  return d;
+}
+function shakeInput(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+
+/* Generic step runner */
+function startTask(mount,def){
+  let step=0;
+  mount.innerHTML='';
+  function showStep(){
+    const s=def.steps[step];
+    const el=document.createElement('div');
+    el.className='step fade-up';
+    el.innerHTML='<div class="step-title">Шаг '+(step+1)+' из '+def.steps.length+'. '+s.title+'</div>';
+    mount.appendChild(el);
+    const api={
+      fb:(type,html)=>fb(el,type,html),
+      next(){step++;showStep();el.scrollIntoView({behavior:'smooth',block:'start'});},
+      done(){
+        const it=document.createElement('div');
+        it.className='itog fade-up';
+        it.innerHTML='<h4>✅ Задание пройдено!</h4>'+def.itog+'<br><button class="btn ghost">Пройти заново</button>';
+        it.querySelector('button').onclick=()=>startTask(mount,def);
+        mount.appendChild(it);
+        markDone(def.id);
+        it.scrollIntoView({behavior:'smooth',block:'nearest'});
+      }
+    };
+    s.init(el,api);
+  }
+  showStep();
+}
+
+/* ================= DND HELPERS ================= */
+function makeChipDrag(chip,onMoveToZone){
+  chip.draggable=true;
+  chip.addEventListener('dragstart',e=>{chip.classList.add('dragging');e.dataTransfer.setData('text/plain',chip.dataset.id);});
+  chip.addEventListener('dragend',()=>chip.classList.remove('dragging'));
+}
+function makeZone(zoneEl,poolEl){
+  zoneEl.addEventListener('dragover',e=>{e.preventDefault();zoneEl.style.borderColor='#7C3AED';});
+  zoneEl.addEventListener('dragleave',()=>zoneEl.style.borderColor='');
+  zoneEl.addEventListener('drop',e=>{
+    e.preventDefault();zoneEl.style.borderColor='';
+    const id=e.dataTransfer.getData('text/plain');
+    const chip=poolEl.querySelector('.chip[data-id="'+id+'"]');
+    if(chip)zoneEl.appendChild(chip);
+  });
+}
+/* click-select interaction */
+function clickSelect(poolEl,zonesSelector){
+  let sel=null;
+  document.addEventListener('click',e=>{
+    const chip=e.target.closest('.chip');
+    if(!chip)return;
+    if(!poolEl.contains(chip)&&!document.querySelector(zonesSelector).parentElement.contains(chip))return;
+  });
+}
+function setupClickAssign(scope,pool){
+  let sel=null;
+  scope.addEventListener('click',e=>{
+    const chip=e.target.closest('.chip');
+    if(chip&&(pool.contains(chip))){
+      if(sel)sel.classList.remove('sel');
+      sel=(sel===chip)?null:chip;
+      if(sel)sel.classList.add('sel');
+      return;
+    }
+    const zone=e.target.closest('.zone-list,.ord-list');
+    if(zone&&sel){
+      zone.appendChild(sel);sel.classList.remove('sel');sel=null;
+      return;
+    }
+    if(chip&&e.target.closest('.zone-list,.ord-list')){
+      pool.appendChild(chip);
+    }
+  });
+}
+
+/* ================= TASK 1 ================= */
+const tableCalcRows=(rows)=>rows.map(r=>'<tr><td><b>'+r.b+'</b></td><td>'+r.a+'%</td><td><input type="text" class="in-1p" placeholder="?" ></td><td><input type="text" class="in-res" placeholder="?"></td></tr>').join('');
+function initCalcTable(step,rows,api,opts){
+  opts=opts||{};
+  step.insertAdjacentHTML('beforeend',
+    '<table class="calc"><tr><th>Число b</th><th>Процент a%</th><th>1% от числа</th><th>Результат (a% от b)</th></tr>'+tableCalcRows(rows)+'</table>'+
+    (opts.extra||'')+
+    '<div class="btn-row"><button class="btn chk">Проверить</button></div>');
+  let tries=0;
+  step.querySelector('.chk').onclick=()=>{
+    const i1=step.querySelectorAll('.in-1p'),ir=step.querySelectorAll('.in-res');
+    let allOk=true,msg=null;
+    rows.forEach((r,i)=>{
+      const v1=parseFloat(norm(i1[i].value).replace(',','.')),v2=parseFloat(norm(ir[i].value).replace(',','.'));
+      const p1=r.b/100,p2=r.b/100*r.a;
+      const ok1=Math.abs(v1-p1)<0.001,ok2=Math.abs(v2-p2)<0.001;
+      i1[i].style.borderColor=ok1?'#10B981':'#EF4444';
+      ir[i].style.borderColor=ok2?'#10B981':'#EF4444';
+      if(!ok1||!ok2)allOk=false;
+      if(!ok2&&!msg){
+        if(r.b===500)msg='err|50% — это половина. Подумай, как найти половину от 500.';
+        else if(r.b===1000)msg='err|25% — это четверть. Подумай, как найти четверть от 1000.';
+        else msg='err|Проверь свои вычисления для числа '+r.b+'. Сначала найди 1%, потом умножь на '+r.a+'.';
+      }
+    });
+    if(opts.extraCheck){
+      const r2=opts.extraCheck();
+      if(r2!==true){allOk=false;msg=r2;}
+    }
+    if(allOk){
+      api.fb('ok','Молодец! Твой способ работает: '+rows.map(r=>r.a+'% от '+r.b+' = '+(r.b/100*r.a)).join(', ')+'.');
+      setTimeout(api.next,1600);
+    }else{
+      tries++;
+      const parts=(msg||'err|Проверь выделенные красным поля.').split('|');
+      let m=parts[1];
+      if(tries>=3)m+='<br><b>Правильный ответ:</b> '+rows.map(r=>r.a+'% от '+r.b+' → 1% = '+(r.b/100)+', результат = '+(r.b/100*r.a)).join('; ')+'.';
+      api.fb(parts[0],m);
+      const bad=step.querySelector('input[style*="EF4444"]');if(bad)shakeInput(bad);
+    }
+  };
+}
+const task1Def={
+  id:'t1',
+  steps:[
+    {title:'Что я знаю о процентах?',init(step,api){
+      step.insertAdjacentHTML('beforeend',
+        '<p class="situation">Ты с родителями в торговом центре. Кроссовки стоят 1500 рублей, на них скидка 45%. Сколько мы сэкономим?</p>'+
+        '<p>Сначала вспомним теорию. Расскажи своими словами: <b>что такое процент?</b></p>'+
+        '<textarea id="t1s1" placeholder="Например: процент — это..."></textarea>'+
+        '<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      let tries=0;
+      step.querySelector('#b').onclick=()=>{
+        const v=step.querySelector('#t1s1').value.trim(),n=norm(v);
+        if(!v){api.fb('hint','Подсказка: процент — это сотая часть числа. 1% = 1/100 = 0,01');shakeInput(step.querySelector('#t1s1'));return;}
+        if(n.includes('1%')||v.toLowerCase().includes('сот')||n.includes('100')){
+          api.fb('ok','Верно! Ты помнишь главное: 1% — это сотая часть числа.');
+          setTimeout(api.next,1600);
+        }else if(v.includes('%')){
+          api.fb('hint','Ты знаешь, что такое процент. А помнишь, чему равен 1%?');
+        }else{
+          tries++;
+          api.fb('hint','Почти! Подсказка: процент — это сотая часть числа. 1% = 1/100 = 0,01'+(tries>=2?'<br>Запиши ответ ещё раз, добавив слово «сотая» или «1%».':''));
+          shakeInput(step.querySelector('#t1s1'));
+        }
+      };
+    }},
+    {title:'Твоя первая проба',init(step,api){
+      step.insertAdjacentHTML('beforeend',
+        '<p>Скидка 45% от 1500 рублей. <b>Как найти 45% от 1500?</b> Запиши способ (можно словами или формулой):</p>'+
+        '<input type="text" id="t1s2" placeholder="Опиши способ или запиши формулу">'+
+        '<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      let tries=0;
+      step.querySelector('#b').onclick=()=>{
+        const inp=step.querySelector('#t1s2'),n=norm(inp.value);
+        if(!n){api.fb('hint','Запиши способ. Подсказка: 45% — это 45 сотых.');shakeInput(inp);return;}
+        tries++;
+        if(n.includes('1500/100*45')){
+          api.fb('ok','Отлично! Ты нашёл 1% (1500 : 100 = 15), а потом умножил на 45. Ты сам нашёл способ! Проверим его на других примерах?');
+          setTimeout(api.next,1800);
+        }else if(n.includes('1500*0.45')){
+          api.fb('ok','Верно! Ты перевёл процент в десятичную дробь и умножил. Это тоже рабочий способ. Но как ты получил 0,45?');
+          setTimeout(api.next,1800);
+        }else if(n.includes('1500*45')){
+          api.fb('err','Ты умножил число на 45. Но 45 — это количество процентов, а не сама доля. Подумай: 45% — это 45 сотых. Может, сначала найти 1%?');
+          shakeInput(inp);
+        }else if(n.includes('1500/45')){
+          api.fb('err','Ты разделил число на процент. Но процент — это доля, а не количество частей. Подумай: 45% — это почти половина. Может, сначала найти 1%?');
+          shakeInput(inp);
+        }else{
+          const sol=tries>=3?'<br><b>Подсказка:</b> сначала найди 1% от 1500, потом умножь на 45. Запиши это формулой.':'';
+          api.fb('hint','Интересная попытка! Давай подумаем вместе. 45% — это 45 сотых. Что нужно сделать сначала, чтобы найти 1%? А потом? Попробуй записать формулой.'+sol);
+          shakeInput(inp);
+        }
+      };
+    }},
+    {title:'Проверь свой способ',init(step,api){
+      step.insertAdjacentHTML('beforeend','<p>Проверим способ на других примерах. Заполни таблицу:</p>');
+      initCalcTable(step,[{b:200,a:10},{b:500,a:50},{b:1000,a:25}],api);
+    }},
+    {title:'Твой способ — в формулу',init(step,api){
+      step.insertAdjacentHTML('beforeend',
+        '<p>Ты нашёл рабочий способ. <b>Запиши его в общем виде: a% от b = ?</b></p>'+
+        '<input type="text" id="t1s4" placeholder="Запиши формулу">'+
+        '<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      let tries=0;
+      step.querySelector('#b').onclick=()=>{
+        const inp=step.querySelector('#t1s4'),n=norm(inp.value);
+        if(!n){api.fb('hint','Запиши формулу. Подсказка: сначала 1% (b : 100), потом умножить на a.');shakeInput(inp);return;}
+        tries++;
+        if(n.includes('b/100*a')){
+          api.fb('ok','Отлично! Ты записал формулу: <b>a% от b = b : 100 · a</b>.');
+          setTimeout(api.done,1600);
+        }else if(n.includes('b*a/100')){
+          api.fb('ok','Тоже верно! Это та же формула, только порядок другой: a% от b = b · a : 100.');
+          setTimeout(api.done,1600);
+        }else if(n.includes('b*0.01*a')){
+          api.fb('ok','Верно! Ты использовал десятичную дробь: a% от b = b · 0,01 · a. 0,01 — это 1%.');
+          setTimeout(api.done,1600);
+        }else{
+          api.fb('hint','Попробуй ещё. Подсказка: сначала найти 1% (b : 100), потом умножить на a.'+(tries>=3?'<br><b>Правильный ответ:</b> a% от b = b : 100 · a':''));
+          shakeInput(inp);
+        }
+      };
+    }}
+  ],
+  itog:'<p>Ты сам нашёл способ находить процент от числа. Это и есть <b>поисковая технология</b> — ты не получил готовый ответ, а нашёл его сам.</p>'
+};
+
+/* ================= TASK 2 ================= */
+const task2Def={
+  id:'t2',
+  steps:[
+    {title:'Гипотеза',init(step,api){
+      step.insertAdjacentHTML('beforeend',
+        '<p>Ты уже умеешь считать проценты: a% от b = b : 100 · a. Но работает ли этот способ <b>всегда</b>? Выбери свой вариант:</p>'+
+        '<label class="opt"><input type="radio" name="h" value="always"> Работает всегда</label>'+
+        '<label class="opt"><input type="radio" name="h" value="gt100"> Только для чисел больше 100</label>'+
+        '<label class="opt"><input type="radio" name="h" value="lt100"> Только для процентов меньше 100%</label>'+
+        '<label class="opt"><input type="radio" name="h" value="unsure"> Не уверен — надо проверить</label>'+
+        '<div class="fb-holder"></div>');
+      step.querySelectorAll('input[name=h]').forEach(r=>r.onchange=()=>{
+        const v=r.value;
+        if(v==='always')api.fb('hint','Это смелая гипотеза! Давай проверим её на необычных примерах. Если хотя бы один случай её опровергнет — гипотеза неверна.');
+        else if(v==='gt100')api.fb('hint','Интересная гипотеза. Проверим: работает ли способ для 80?');
+        else if(v==='lt100')api.fb('hint','А что будет с 150%? Проверим?');
+        else api.fb('ok','Это честно! Именно поэтому мы и проводим исследование.');
+        setTimeout(api.next,2200);
+      });
+    }},
+    {title:'Проверка на обычных примерах',init(step,api){
+      step.insertAdjacentHTML('beforeend','<p>Сначала — привычные числа. Заполни таблицу:</p>');
+      initCalcTable(step,[{b:200,a:10},{b:500,a:50},{b:1000,a:25}],api);
+    }},
+    {title:'Проверка на «хитрых» примерах',init(step,api){
+      const rows=[{b:80,a:150,f:'150% от 80 — больше целого'},{b:300,a:'0,5',f:'0,5% от 300 — меньше 1%'},{b:0,a:50,f:'50% от нуля'},{b:200,a:200,f:'200% от 200 — в два раза больше'}];
+      step.insertAdjacentHTML('beforeend',
+        '<p>А теперь примеры посложнее. Найди результат:</p>'+
+        '<table class="calc"><tr><th>Число</th><th>Процент</th><th>Результат</th></tr>'+
+        rows.map((r,i)=>'<tr><td><b>'+r.b+'</b></td><td>'+r.a+'%</td><td><input type="text" class="tr-res" data-i="'+i+'" placeholder="?"></td></tr>').join('')+
+        '</table>'+
+        '<p style="margin-top:10px">Что заметил? Запиши наблюдение:</p>'+
+        '<textarea id="notice" placeholder="Например: когда процент больше 100..."></textarea>'+
+        '<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      const msgs=[
+        {ok:'Верно! 150% — это больше целого. 80 · 1,5 = 120. Результат больше исходного числа.',bad:'Ты получил мало. 150% — это больше 100%, значит результат должен быть больше 80. Проверь.'},
+        {ok:'Верно! 0,5% — это половина процента. Результат меньше 1% от 300 (то есть меньше 3).',bad:'Ты получил слишком много. 0,5% — это очень маленькая доля. Проверь.'},
+        {ok:'Верно! От нуля любая доля — ноль. Это особый случай.',bad:'Проверь: 0 · (50 : 100) = 0.'},
+        {ok:'Верно! 200% — это в два раза больше. 200 · 2 = 400.',bad:'Ты получил слишком мало. 200% — это больше целого в два раза. Проверь.'}
+      ];
+      const answers=[120,1.5,0,400];
+      step.querySelector('#b').onclick=()=>{
+        const inputs=step.querySelectorAll('.tr-res');
+        const notice=step.querySelector('#notice');
+        if(!notice.value.trim()){api.fb('hint','Сначала запиши, что ты заметил, — это важная часть исследования.');shakeInput(notice);return;}
+        let allOk=true,firstBad=-1;
+        inputs.forEach((inp,i)=>{
+          const v=parseFloat(norm(inp.value));
+          const ok=Math.abs(v-answers[i])<0.001;
+          inp.style.borderColor=ok?'#10B981':'#EF4444';
+          if(!ok){allOk=false;if(firstBad<0)firstBad=i;}
+        });
+        if(allOk){
+          api.fb('ok','Все верно! 150% от 80 = 120, 0,5% от 300 = 1,5, 50% от 0 = 0, 200% от 200 = 400. Способ не сломался ни в одном случае!');
+          setTimeout(api.next,1800);
+        }else{
+          api.fb('err',msgs[firstBad].bad);
+          shakeInput(inputs[firstBad]);
+        }
+      };
+    }},
+    {title:'Анализ результатов',init(step,api){
+      const qs=[
+        {q:'В каких случаях способ работал?',opts:['Для чисел больше 100','Для процентов меньше 100%','Для любых чисел и процентов','Кроме нуля'],correct:2,okMsg:'Ты прав: способ работает всегда (и с нулём тоже: от нуля — ноль), но результат зависит от процента.',badMsg:'Вспомни таблицу: способ сработал и для 80, и для 0,5%, и для 200%. Выбери ещё раз.'},
+        {q:'Что происходит, когда процент больше 100%?',opts:['Результат больше исходного числа','Результат меньше исходного','Результат равен исходному'],correct:0,okMsg:'Проверь: 150% от 80 = 120. 120 > 80. Верно!',badMsg:'Проверь: 150% от 80 = 120. 120 > 80. Выбери ещё раз.'},
+        {q:'Что происходит, когда процент меньше 1%?',opts:['Результат больше исходного','Результат очень маленький','Результат равен 1'],correct:1,okMsg:'0,5% от 300 = 1,5. Это меньше 1% от 300 (то есть 3). Верно!',badMsg:'0,5% от 300 = 1,5. Результат очень маленький. Выбери ещё раз.'}
+      ];
+      step.insertAdjacentHTML('beforeend',qs.map((q,i)=>
+        '<p style="margin-top:'+(i?'14px':'0')+'"><b>'+(i+1)+'. '+q.q+'</b></p>'+
+        q.opts.map((o,j)=>'<label class="opt"><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')
+      ).join('')+'<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      step.querySelector('#b').onclick=()=>{
+        for(let i=0;i<3;i++){
+          const c=step.querySelector('input[name=q'+i+']:checked');
+          if(!c){api.fb('hint','Ответь на все три вопроса.');return;}
+          if(+c.value!==qs[i].correct){api.fb('err',qs[i].badMsg);return;}
+        }
+        api.fb('ok',qs.map(q=>q.okMsg).join('<br>'));
+        setTimeout(api.next,1800);
+      };
+    }},
+    {title:'Вывод',init(step,api){
+      step.insertAdjacentHTML('beforeend',
+        '<p>Итак, что мы можем сказать о гипотезе?</p>'+
+        '<div class="btn-row">'+
+        '<button class="btn ghost c">Гипотеза подтвердилась полностью</button>'+
+        '<button class="btn ghost c">Гипотеза подтвердилась частично</button>'+
+        '<button class="btn ghost c">Гипотеза не подтвердилась</button>'+
+        '</div>');
+      step.querySelectorAll('.c').forEach(b=>b.onclick=()=>{
+        const t=b.textContent;
+        if(t.includes('полностью'))api.fb('hint','А как же случай с нулём? И с процентами больше 100%? Способ работает, но результат зависит от процента. Выбери ещё раз.');
+        else if(t.includes('частично')){api.fb('ok','Верно! Способ работает для любых чисел и процентов, но нужно учитывать особенности.');setTimeout(api.done,1800);}
+        else api.fb('err','Не совсем. Способ работает — он не ломается. Просто результат может быть неожиданным. Выбери ещё раз.');
+      });
+    }}
+  ],
+  itog:'<p>Твой способ работает для любых чисел и процентов. Но нужно помнить:</p><ul><li>если процент больше 100%, результат больше исходного числа;</li><li>если процент меньше 1%, результат очень маленький;</li><li>от нуля любая доля — ноль.</li></ul><p>Это <b>исследовательская технология</b>: ты выдвинул гипотезу, проверил её, обнаружил особенности и сделал вывод.</p>'
+};
+
+/* ================= TASK 3 ================= */
+const task3Def={
+  id:'t3',
+  steps:[
+    {title:'Цель проекта',init(step,api){
+      const items=['Помочь родителям быстро считать скидки','Помочь друзьям не путаться в скидках «20% + 10%»','Помочь младшим школьникам понять, что такое процент','Просто сделать красивую картинку','Показать, что я умею считать проценты'];
+      step.insertAdjacentHTML('beforeend',
+        '<p class="situation">Ты умеешь считать проценты. Теперь помоги другим — создай памятку «Как считать скидки». Сначала определи цель.</p>'+
+        '<p><b>Зачем нужна памятка? Кому она поможет?</b> (можно выбрать несколько вариантов)</p>'+
+        items.map((t,i)=>'<label class="opt"><input type="checkbox" value="'+i+'"> '+t+'</label>').join('')+
+        '<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      step.querySelector('#b').onclick=()=>{
+        const sel=[...step.querySelectorAll('input:checked')].map(c=>+c.value);
+        if(sel.includes(3)){api.fb('hint','Красивая картинка — хорошо, но памятка должна помогать. Кому она адресована?');return;}
+        if(sel.includes(4)&&sel.length===1){api.fb('hint','Показать умения — неплохо, но проект ценен, когда нужен другим. Добавь, кому памятка поможет.');return;}
+        const good=sel.filter(x=>x<=2).length;
+        if(good>=1){api.fb('ok','Отличная цель! Твоя памятка будет полезной.');setTimeout(api.next,1500);}
+        else api.fb('hint','Подумай: у тебя есть родители, друзья, младшие братья и сёстры. Кому памятка может пригодиться?');
+      };
+    }},
+    {title:'План работы',init(step,api){
+      const items=['Определить, что будет в памятке','Собрать примеры скидок из жизни','Написать формулу','Оформить памятку','Проверить памятку по критериям','Показать памятку родителям'];
+      step.insertAdjacentHTML('beforeend',
+        '<p>Расставь шаги проекта в правильном порядке. <b>Перетащи карточки</b> или коснись одной, затем другой — они поменяются местами.</p>'+
+        '<div class="ord-list" id="ord"></div>'+
+        '<div class="btn-row"><button class="btn" id="b">Проверить порядок</button></div>');
+      const list=step.querySelector('#ord');
+      items.forEach((t,i)=>{
+        const c=document.createElement('div');
+        c.className='ord-card';c.draggable=true;c.dataset.id=i;
+        c.innerHTML='<span class="grip">≡</span> '+t;
+        list.appendChild(c);
+      });
+      /* shuffle initial order */
+      const shuffled=[3,0,5,1,4,2];
+      shuffled.forEach(id=>list.appendChild(list.querySelector('[data-id="'+id+'"]')));
+      /* drag reorder */
+      list.addEventListener('dragstart',e=>{const c=e.target.closest('.ord-card');if(c)c.classList.add('dragging');});
+      list.addEventListener('dragend',e=>{const c=e.target.closest('.ord-card');if(c)c.classList.remove('dragging');});
+      list.addEventListener('dragover',e=>{
+        e.preventDefault();
+        const drag=list.querySelector('.dragging');if(!drag)return;
+        const after=[...list.querySelectorAll('.ord-card:not(.dragging)')].reduce((closest,child)=>{
+          const box=child.getBoundingClientRect();
+          const offset=e.clientY-box.top-box.height/2;
+          return(offset<0&&offset>closest.offset)?{offset,element:child}:closest;
+        },{offset:-Infinity}).element;
+        if(after)list.insertBefore(drag,after);else list.appendChild(drag);
+      });
+      /* click swap */
+      let sel=null;
+      list.addEventListener('click',e=>{
+        const c=e.target.closest('.ord-card');if(!c)return;
+        if(!sel){sel=c;c.classList.add('sel');}
+        else if(sel===c){c.classList.remove('sel');sel=null;}
+        else{
+          const a=sel,b=c,na=document.createElement('span'),nb=document.createElement('span');
+          list.insertBefore(na,b);list.insertBefore(nb,a);
+          list.insertBefore(a,nb);list.insertBefore(b,na);
+          na.remove();nb.remove();
+          a.classList.remove('sel');sel=null;
+        }
+      });
+      step.querySelector('#b').onclick=()=>{
+        const order=[...list.children].map(c=>+c.dataset.id);
+        const correct=items.map((_,i)=>i).join(',')===order.join(',');
+        if(correct){api.fb('ok','Отлично! Ты спланировал работу: сначала содержание, потом материал, формула, оформление, проверка и презентация.');setTimeout(api.next,1600);}
+        else{
+          const firstWrong=order.findIndex((v,i)=>v!==i);
+          api.fb('err','Пока не так. Подумай: можно ли оформить памятку, не зная, что в ней будет? Проверь место шага «'+items[firstWrong]+'».');
+        }
+      };
+    }},
+    {title:'Сбор данных',init(step,api){
+      step.insertAdjacentHTML('beforeend',
+        '<p>Напиши <b>три примера скидок</b> из жизни. Подсказка: скидка 30% на кроссовки за 2000 руб., «вторая пицца за полцены», скидка 15% на книги и т.д.</p>'+
+        [1,2,3].map(i=>'<input type="text" class="ex" placeholder="Пример '+i+'" style="margin-bottom:8px">').join('')+
+        '<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      step.querySelector('#b').onclick=()=>{
+        const exs=[...step.querySelectorAll('.ex')];
+        const filled=exs.filter(e=>e.value.trim().length>2);
+        if(filled.length===3){api.fb('ok','Отлично! Теперь у тебя есть материал для памятки.');setTimeout(api.next,1500);}
+        else if(filled.length>=1){api.fb('hint','Для памятки нужно минимум 3 примера. Добавь ещё '+(3-filled.length)+'.');}
+        else api.fb('hint','Подсказка: вспомни скидки в магазинах — на одежду, еду, книги, игрушки.');
+      };
+    }},
+    {title:'Создание продукта',init(step,api){
+      const els=[
+        {id:'h',t:'«Как считать скидки»'},
+        {id:'f',t:'a% от b = b : 100 · a'},
+        {id:'ex',t:'Скидка 30% на товар за 2000 руб. = 600 руб. экономии'},
+        {id:'adv',t:'Проверяй: 20% + 10% ≠ 30%'},
+        {id:'warn',t:'Если скидка больше 100% — это уже наценка'}
+      ];
+      const zones=[
+        {id:'h',t:'Заголовок'},{id:'f',t:'Формула'},{id:'ex',t:'Пример'},{id:'adv',t:'Совет'},{id:'warn',t:'Предупреждение'}
+      ];
+      step.insertAdjacentHTML('beforeend',
+        '<p>Собери памятку: перетащи (или коснись) каждый элемент и помести в нужный блок.</p>'+
+        '<div class="pool" id="pool3"></div>'+
+        zones.map(z=>'<div class="zone"><h4>'+z.t+'</h4><div class="zone-list" data-zone="'+z.id+'"></div></div>').join('')+
+        '<div class="btn-row"><button class="btn" id="b">Проверить памятку</button></div>');
+      const pool=step.querySelector('#pool3');
+      const order=[2,4,0,3,1];
+      order.forEach(i=>{
+        const c=document.createElement('div');
+        c.className='chip';c.draggable=true;c.dataset.id=els[i].id;c.textContent=els[i].t;
+        pool.appendChild(c);
+      });
+      step.querySelectorAll('.zone-list').forEach(z=>makeZone(z,pool));
+      setupClickAssign(step,pool);
+      step.querySelector('#b').onclick=()=>{
+        let ok=true,wrongZone=null,chipText='';
+        zones.forEach(z=>{
+          const zEl=step.querySelector('[data-zone="'+z.id+'"]');
+          const chips=[...zEl.querySelectorAll('.chip')];
+          if(chips.length!==1||chips[0].dataset.id!==z.id){ok=false;if(!wrongZone){wrongZone=z;chipText=chips[0]?chips[0].textContent:'';}}
+        });
+        if(ok){api.fb('ok','Памятка готова! Проверь по критериям.');setTimeout(api.next,1500);}
+        else{
+          const names={h:'заголовком',f:'формулой',ex:'примером',adv:'советом',warn:'предупреждением'};
+          api.fb('err','Есть неточность. Подумай: какой элемент должен быть '+names[wrongZone.id]+'?'+(chipText?'<br>«'+chipText+'» — точно на своём месте?':''));
+        }
+      };
+    }},
+    {title:'Проверка по критериям',init(step,api){
+      const items=['Есть заголовок','Есть формула','Есть пример','Есть совет или предупреждение','Понятно тому, кто не любит математику','Оформлено аккуратно'];
+      step.insertAdjacentHTML('beforeend',
+        '<p>Отметь, что выполнено в твоей памятке:</p>'+
+        items.map(t=>'<label class="opt"><input type="checkbox"> '+t+'</label>').join('')+
+        '<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      step.querySelector('#b').onclick=()=>{
+        const n=step.querySelectorAll('input:checked').length;
+        if(n===6){api.fb('ok','Отлично! Памятка готова к презентации.');setTimeout(api.next,1500);}
+        else if(n>=4)api.fb('hint','Хорошо, но есть что улучшить. Посмотри, что ещё можно добавить.');
+        else api.fb('err','Памятка пока не готова. Вернись к шагу 4 и доработай её.');
+      };
+    }},
+    {title:'Презентация',init(step,api){
+      const qs=[
+        {q:'Кому покажешь памятку?',opts:['Родителям','Друзьям','Младшим','Учителю'],fb:'Отлично! Зрители оценят твой труд.'},
+        {q:'Что было трудным?',opts:['Подобрать примеры','Записать формулу','Оформить памятку','Проверить по критериям'],fb:'Здорово, что ты это заметил — в следующем проекте будет легче.'},
+        {q:'Что изменишь?',opts:['Добавить примеров','Сделать проще','Сделать красивее','Ничего, всё хорошо'],fb:'План на улучшение есть — это зрелая рефлексия.'}
+      ];
+      step.insertAdjacentHTML('beforeend',qs.map((q,i)=>
+        '<p style="margin-top:'+(i?'12px':'0')+'"><b>'+(i+1)+'. '+q.q+'</b></p>'+
+        q.opts.map((o,j)=>'<label class="opt"><input type="radio" name="p'+i+'" value="'+j+'"> '+o+'</label>').join('')
+      ).join('')+'<div class="btn-row"><button class="btn" id="b">Завершить проект</button></div>');
+      step.querySelector('#b').onclick=()=>{
+        for(let i=0;i<3;i++){
+          if(!step.querySelector('input[name=p'+i+']:checked')){api.fb('hint','Ответь на все три вопроса — это рефлексия проекта.');return;}
+        }
+        api.fb('ok',qs.map(q=>q.fb).join('<br>'));
+        setTimeout(api.done,1800);
+      };
+    }}
+  ],
+  itog:'<p>Ты создал продукт — памятку. Это <b>проектная технология</b>: цель → план → данные → продукт → проверка по критериям → презентация.</p>'
+};
+
+/* ================= TASK 4 ================= */
+const task4Def={
+  id:'t4',
+  steps:[
+    {title:'Шесть ситуаций — определи технологию',init(step,api){
+      const data=[
+        {s:'Ученики собирают данные о ценах, строят таблицу и делают вывод: «Большая упаковка не всегда выгоднее».',a:'research',fb:'Верно! Есть данные, анализ и вывод — это исследование.'},
+        {s:'Ученики создают математическую игру для пятиклассников.',a:'project',fb:'Верно! Создан конкретный продукт для реальных пользователей — это проект.'},
+        {s:'Ученик решает задачу «30% или 20%+10%?», не зная алгоритма, и пробует разные способы.',a:'search',fb:'Верно! Нет готового алгоритма — ученик сам ищет способ. Это поисковая задача.'},
+        {s:'Ученики выдвигают гипотезу о дальности полёта мяча, проводят эксперимент, строят график.',a:'research',fb:'Верно! Гипотеза → эксперимент → данные → вывод. Классическое исследование.'},
+        {s:'Ученики решают задачу «Как разделить 3 яблока на 4 человек?», а учитель не даёт алгоритм.',a:'search',fb:'Верно! Задача без шаблона — нужно изобрести способ. Поисковая технология.'},
+        {s:'Ученики создают интерактивный сайт со способами решения квадратных уравнений.',a:'project',fb:'Верно! Сайт — готовый продукт с практической ценностью. Это проект.'}
+      ];
+      const names={project:'Проект',search:'Поиск',research:'Исследование'};
+      const wrongFb={
+        project:{search:'Подумай: создаётся ли здесь продукт с длительным результатом? Нет — ищут способ. Это поиск.',research:'Здесь нет гипотезы и проверки. Ученики делают продукт — это проект.'},
+        search:{project:'Здесь нет готового продукта. Ученик решает задачу без алгоритма — это поиск.',research:'Исследование начинается с гипотезы и данных. Здесь ученик просто ищет способ решения — это поиск.'},
+        research:{project:'Здесь главное не продукт, а проверка гипотезы данными. Это исследование.',search:'Поиск — это задача без алгоритма. А здесь есть гипотеза, эксперимент и вывод — это исследование.'}
+      };
+      let done=0;
+      step.insertAdjacentHTML('beforeend',data.map((d,i)=>
+        '<div class="situation-block" data-i="'+i+'"><p><b>Ситуация '+(i+1)+'.</b> '+d.s+'</p>'+
+        '<div class="tech-btns">'+Object.keys(names).map(k=>'<button class="btn small" data-t="'+k+'">'+names[k]+'</button>').join('')+'</div></div>'
+      ).join(''));
+      step.querySelectorAll('.situation-block').forEach((block,i)=>{
+        const correct=data[i].a;
+        block.querySelectorAll('button').forEach(btn=>{
+          btn.onclick=()=>{
+            const pick=btn.dataset.t;
+            let fbEl=block.querySelector('.fb');if(fbEl)fbEl.remove();
+            const div=document.createElement('div');
+            if(pick===correct){
+              div.className='fb ok';div.textContent=data[i].fb;
+              btn.classList.add('correct-pick');
+              block.querySelectorAll('button').forEach(b=>b.disabled=true);
+              done++;
+              if(done===6)setTimeout(api.done,1600);
+            }else{
+              div.className='fb err';div.textContent=wrongFb[correct][pick]+' Попробуй ещё раз.';
+              btn.classList.add('wrong-pick');setTimeout(()=>btn.classList.remove('wrong-pick'),900);
+            }
+            block.appendChild(div);
+          };
+        });
+      });
+    }}
+  ],
+  itog:'<p>Ты разобрался: <b>проект</b> — продукт, <b>поиск</b> — задача без алгоритма, <b>исследование</b> — гипотеза и проверка.</p>'
+};
+
+/* ================= TASK 5 ================= */
+const task5Def={
+  id:'t5',
+  steps:[
+    {title:'12 приёмов — 4 этапа урока',init(step,api){
+      const techs=[
+        {id:'m1',t:'Показ жизненной ситуации',z:'mot'},{id:'m2',t:'Кейс-заправка',z:'mot'},{id:'m3',t:'Шкала интересов',z:'mot'},
+        {id:'p1',t:'Проблемный вопрос',z:'prob'},{id:'p2',t:'Гипотеза',z:'prob'},
+        {id:'i1',t:'Сбор данных',z:'inv'},{id:'i2',t:'Эксперимент',z:'inv'},{id:'i3',t:'Таблица результатов',z:'inv'},
+        {id:'r1',t:'Светофор',z:'ref'},{id:'r2',t:'Лестница успеха',z:'ref'},{id:'r3',t:'Плюс-минус-интересно',z:'ref'},{id:'r4',t:'Вопрос «чему научился?»',z:'ref'}
+      ];
+      const zones=[{id:'mot',t:'Мотивация'},{id:'prob',t:'Постановка проблемы'},{id:'inv',t:'Исследование'},{id:'ref',t:'Рефлексия'}];
+      step.insertAdjacentHTML('beforeend',
+        '<p>Перетащи каждый приём в нужный этап урока (или коснись приёма, затем этапа).</p>'+
+        '<div class="pool" id="pool5"></div>'+
+        zones.map(z=>'<div class="zone"><h4>'+z.t+'</h4><div class="zone-list" data-zone="'+z.id+'"></div></div>').join('')+
+        '<div class="btn-row"><button class="btn ghost" id="hint">Подсказка</button><button class="btn" id="b">Проверить</button></div>');
+      const pool=step.querySelector('#pool5');
+      const shuffled=[...techs].sort(()=>Math.random()-.5);
+      shuffled.forEach(t=>{
+        const c=document.createElement('div');
+        c.className='chip';c.draggable=true;c.dataset.id=t.id;c.textContent=t.t;
+        pool.appendChild(c);
+      });
+      step.querySelectorAll('.zone-list').forEach(z=>makeZone(z,pool));
+      setupClickAssign(step,pool);
+      step.querySelector('#hint').onclick=()=>api.fb('hint','Мотивация — интерес. Проблема — вопрос. Исследование — данные. Рефлексия — итог.');
+      let tries=0;
+      step.querySelector('#b').onclick=()=>{
+        tries++;
+        let correct=0,total=0,wrongZone=null;
+        zones.forEach(z=>{
+          const chips=[...step.querySelector('[data-zone="'+z.id+'"]').querySelectorAll('.chip')];
+          chips.forEach(c=>{
+            total++;
+            const t=techs.find(x=>x.id===c.dataset.id);
+            if(t.z===z.id)correct++;
+            else if(!wrongZone)wrongZone={zone:z.t,chip:t.t};
+          });
+        });
+        if(correct===12){
+          api.fb('ok','Все 12 приёмов на своих местах! Например, «Светофор» — это рефлексия: ученик оценивает свой итог.');
+          setTimeout(api.done,1600);
+        }else{
+          let m='Пока '+correct+' из 12 верно. ';
+          if(wrongZone)m+='Приём «'+wrongZone.chip+'» не подходит этапу «'+wrongZone.zone+'». Подумай: на каком этапе ученик ставит цель?';
+          if(tries>=3)m+='<br><b>Правильный ответ:</b> Мотивация — жизненная ситуация, кейс-заправка, шкала интересов; Проблема — проблемный вопрос, гипотеза; Исследование — сбор данных, эксперимент, таблица результатов; Рефлексия — светофор, лестница успеха, плюс-минус-интересно, вопрос «чему научился?».';
+          api.fb('err',m);
+        }
+      };
+    }}
+  ],
+  itog:'<p>Ты научился подбирать приёмы к этапам урока: интерес → проблема → данные → итог.</p>'
+};
+
+/* ================= TASK 6 ================= */
+const task6Def={
+  id:'t6',
+  steps:[
+    {title:'Оцени проект Пети по критериям',init(step,api){
+      step.insertAdjacentHTML('beforeend',
+        '<p class="situation">Петя выполнял проект «Памятка по процентам». Он сформулировал проблему («друзья путают скидки»), поставил цель, собрал три примера, сделал расчёты и оформил памятку. Но рефлексию не провёл и памятку по критериям не проверил.</p>'+
+        '<p>Отметь, <b>что Петя выполнил</b>:</p>'+
+        ['Проблема сформулирована','Цель поставлена','Данные собраны','Расчёты сделаны','Продукт создан','Рефлексия проведена','Продукт проверен по критериям'].map((t,i)=>'<label class="opt"><input type="checkbox" data-i="'+i+'"> '+t+'</label>').join('')+
+        '<div class="btn-row"><button class="btn" id="b">Проверить оценку</button></div>');
+      step.querySelector('#b').onclick=()=>{
+        const checked=[...step.querySelectorAll('input:checked')].map(c=>+c.dataset.i).sort((a,b)=>a-b).join(',');
+        const expect='0,1,2,3,4';
+        const allChecked='0,1,2,3,4,5,6';
+        if(checked===allChecked){api.fb('err','Посмотри внимательно: Петя не провёл рефлексию и не проверил памятку по критериям. Сними эти два пункта.');return;}
+        if(checked===expect){api.fb('ok','Молодец! Ты заметил, что рефлексия и проверка отсутствуют — проект не завершён полностью.');setTimeout(api.next,1600);return;}
+        if(!checked.includes('0')){api.fb('err','Подумай: Петя сформулировал проблему? Да, в начале — «друзья путают скидки».');return;}
+        if(checked.includes('5')||checked.includes('6')){api.fb('err','Вспомни текст: Петя не провёл рефлексию и не проверил памятку по критериям. Сними лишние галочки.');return;}
+        api.fb('hint','Отметь все пункты, которые выполнил Петя. Внимательно перечитай описание его работы.');
+      };
+    }},
+    {title:'Что посоветовать Пете?',init(step,api){
+      step.insertAdjacentHTML('beforeend',
+        '<p>Выбери, что стоит посоветовать Пете (можно несколько вариантов):</p>'+
+        ['Провести рефлексию','Проверить памятку по критериям','Добавить примеров','Ничего, всё хорошо'].map((t,i)=>'<label class="opt"><input type="checkbox" value="'+i+'"> '+t+'</label>').join('')+
+        '<div class="btn-row"><button class="btn" id="b">Проверить</button></div>');
+      step.querySelector('#b').onclick=()=>{
+        const sel=[...step.querySelectorAll('input:checked')].map(c=>+c.value).sort().join(',');
+        if(sel==='3'){api.fb('err','Даже хороший проект можно улучшить. Петя пропустил два важных этапа — посоветуй что-то из них.');return;}
+        if(sel.includes('3')){api.fb('hint','«Ничего» — не лучший совет: рефлексия и проверка всё же нужны. Убери этот пункт.');return;}
+        if(sel===''||sel==='0,1'){api.fb('ok','Верно! Рефлексия и проверка по критериям — то, чего не хватило проекту Пети.');setTimeout(api.done,1600);}
+        else if(sel.includes('2'))api.fb('hint','Примеров у Пети уже три — их достаточно. Чего не хватает проекту именно по описанию?');
+        else api.fb('hint','Подумай: какие два этапа Петя пропустил?');
+      };
+    }}
+  ],
+  itog:'<p>Ты научился оценивать проект по критериям. Это <b>формирующее оценивание</b>: оно не ставит оценку за всё, а показывает, что улучшить.</p>'
+};
+
+/* ================= CERTIFICATE ================= */
+function openCert(){
+  const name=document.getElementById('certName').value.trim();
+  document.getElementById('certNameOut').textContent=name||'Имя не указано';
+  const d=new Date();
+  document.getElementById('certDate').textContent='Дата прохождения: '+d.toLocaleDateString('ru-RU');
+  document.getElementById('certModal').classList.add('on');
+}
+function closeCert(){document.getElementById('certModal').classList.remove('on');}
+document.getElementById('certModal').addEventListener('click',e=>{if(e.target.id==='certModal')closeCert();});
+
+updateUI();
+</script>
+</body>
+</html>
